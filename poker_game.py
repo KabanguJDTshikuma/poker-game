@@ -1,26 +1,6 @@
 from collections import Counter
 
 
-def sequential_values(ranks: list):
-    """evaluate if the elements of ranks are sequential"""
-    count = 0
-    for i in range(0, len(ranks) - 1):
-        if ranks[i + 1] - 1 != ranks[i]:
-            count += 1
-    if count == 0:
-        return True
-    else:
-        return False
-
-
-def hand_split(hand: list, value_dict=None):
-    """split suits and ranks from the hand and return them as dictionary of lists"""
-    suits = [card[-1].upper() for card in hand]
-    values = [value_dict[card[:-1].upper()] for card in hand]
-    hand_split_dict = list(zip(values, suits))
-    return {'suits': suits, 'values': values, 'hands': hand_split_dict}
-
-
 class Poker:
     def __init__(self):
         # suits = ['Hearts','Diamonds','Clubs','Spades'] 
@@ -30,34 +10,60 @@ class Poker:
                       "K": 13, "A": 14}
         self.cards = [f'{value}{suit}' for suit in suits for value in self.values]
 
+    @staticmethod
+    def hand_split(hand: list, value_dict=None):
+        """split suits and ranks from the hand and return them as dictionary of lists"""
+        suits = [card[-1].upper() for card in hand]
+        values = [value_dict[card[:-1].upper()] for card in hand]
+        hand_split_dict = list(zip(values, suits))
+        return {'suits': suits, 'values': values, 'hands': hand_split_dict}
+
+    @staticmethod
+    def sequential_values(ranks: list):
+        """evaluate if the elements of ranks are sequential"""
+        count = 0
+        for i in range(0, len(ranks) - 1):
+            if ranks[i + 1] - 1 != ranks[i]:
+                count += 1
+        if count == 0:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def check_suits_order(value_count, hands_zip):
+        suits = []
+        for k, v in value_count.items():
+            if v == 2:
+                for i in range(0, len(hands_zip)):
+                    if k == hands_zip[i][0]:
+                        suits.append(hands_zip[i][1])
+        return suits
+
     def royal_flash(self, hand: list):
-        # print("hand ", hand)
-        # print('suits ', hand_split(hand, self.ranks)['suits'])
-        # print('values ', hand_split(hand, self.ranks)['values'])
-        if len(set(hand_split(hand, self.ranks)['suits'])) == 1 and set(hand_split(hand, self.ranks)['values']) == set(
+        if len(set(self.hand_split(hand, self.ranks)['suits'])) == 1 and set(self.hand_split(hand, self.ranks)['values']) == set(
                 range(10, 15)):
             return True
         return False
 
     def straight_flush(self, hand: list):
-        values = sorted(hand_split(hand, self.ranks)['values'])
-        if len(set(hand_split(hand, self.ranks)['suits'])) == 1 and sequential_values(
+        values = sorted(self.hand_split(hand, self.ranks)['values'])
+        if len(set(self.hand_split(hand, self.ranks)['suits'])) == 1 and self.sequential_values(
                 values) == True and self.royal_flash(hand) == False:
             return True
         return False
 
     def four_of_kind(self, hand: list):
-        value_count = Counter(hand_split(hand, self.ranks)['values'])
-        suits_count = Counter(hand_split(hand, self.ranks)['suits'])
+        value_count = Counter(self.hand_split(hand, self.ranks)['values'])
+        suits_count = Counter(self.hand_split(hand, self.ranks)['suits'])
         if 4 in list(value_count.values()) and list(suits_count.values()).count(1) >= 3:
             return True
         return False
 
     def tree_of_kind(self, hand: list):
-        value_count = Counter(hand_split(hand, self.ranks)['values'])
-        suits_count = Counter(hand_split(hand, self.ranks)['suits'])
+        value_count = Counter(self.hand_split(hand, self.ranks)['values'])
+        suits_count = Counter(self.hand_split(hand, self.ranks)['suits'])
         suits = list(suits_count.values())
-        # print(hand_split(hand, self.ranks)['hands'])
 
         if 3 in list(value_count.values()) and (
                 suits.count(1) == 3 or sorted(suits) == [1, 2, 2] or sorted(suits) == [1, 1, 3]):
@@ -65,76 +71,42 @@ class Poker:
         return False
 
     def full_house(self, hand: list):
-        value_count = Counter(hand_split(hand, self.ranks)['values'])
-        # suits_count = Counter(hand_split(hand, self.ranks)['suits'])
-        hands_zip = hand_split(hand, self.ranks)['hands']
-        suits = []
+        value_count = Counter(self.hand_split(hand, self.ranks)['values'])
+        hands_zip = self.hand_split(hand, self.ranks)['hands']
         if self.tree_of_kind(hand) and list(value_count.values()).count(2) == 1:
-            for k, v in value_count.items():
-                if v == 2:
-                    for i in range(0, len(hands_zip)):
-                        if k == hands_zip[i][0]:
-                            suits.append(hands_zip[i][1])
+            suits = self.check_suits_order(value_count, hands_zip)
             if len(set(suits)) == 2:
                 return True
-            else:
-                return False
-
         return False
 
     def flash(self, hand: list):
-        if len(set(hand_split(hand, self.ranks)['suits'])) == 1:
+        if len(set(self.hand_split(hand, self.ranks)['suits'])) == 1:
             return True
         return False
 
     def straight(self, hand: list):
-        values = sorted(hand_split(hand, self.ranks)['values'])
-        # print(values, sequential_values(values))
-        if sequential_values(values) and len(set(hand_split(hand, self.ranks)['suits'])) > 1:
+        values = sorted(self.hand_split(hand, self.ranks)['values'])
+        if self.sequential_values(values) and len(set(self.hand_split(hand, self.ranks)['suits'])) > 1:
             return True
         return False
 
     def two_pairs(self, hand: list):
-        value_count = Counter(hand_split(hand, self.ranks)['values'])
-        # suits_count = Counter(hand_split(hand, self.ranks)['suits'])
-        hands_zip = hand_split(hand, self.ranks)['hands']
-        suits = []
+        value_count = Counter(self.hand_split(hand, self.ranks)['values'])
+        hands_zip = self.hand_split(hand, self.ranks)['hands']
         if list(value_count.values()).count(2) == 2:
-            for k, v in value_count.items():
-                if v == 2:
-                    for i in range(0, len(hands_zip)):
-                        if k == hands_zip[i][0]:
-                            suits.append(hands_zip[i][1])
+            suits = self.check_suits_order(value_count, hands_zip)
             if len(suits) == 4:
-                # print(suits)
                 return True
-            # else:
         return False
 
     def pair(self, hand: list):
-        value_count = Counter(hand_split(hand, self.ranks)['values'])
-        # suits_count = Counter(hand_split(hand, self.ranks)['suits'])
-        hands_zip = hand_split(hand, self.ranks)['hands']
-        suits = []
+        value_count = Counter(self.hand_split(hand, self.ranks)['values'])
+        hands_zip = self.hand_split(hand, self.ranks)['hands']
         if list(value_count.values()).count(2) == 1:
-            for k, v in value_count.items():
-                if v == 2:
-                    for i in range(0, len(hands_zip)):
-                        if k == hands_zip[i][0]:
-                            suits.append(hands_zip[i][1])
+            suits = self.check_suits_order(value_count, hands_zip)
             if len(suits) == 2:
                 return True
-            else:
-                return False
-
         return False
-
-    # def high_card(self, hand: list):
-    #     if not self.pair(hand) and not self.two_pairs(hand) and not self.flash(hand) and not self.straight(
-    #             hand) and not self.royal_flash(hand) and not self.straight_flush(hand) and not self.four_of_kind(
-    #         hand) and not self.tree_of_kind(hand) and not self.full_house(hand) and not self.flash(hand):
-    #         return True
-    #     return False
 
 
 def poker_game(hand: list):
@@ -163,7 +135,6 @@ def poker_game(hand: list):
 def main():
     cards = Poker().cards
     print(cards)
-    # hand = ['5D', '5C', '5H', '5S', '3H']
     hand = []
     while True:
         if len(hand) < 5:

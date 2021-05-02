@@ -1,0 +1,23 @@
+commit f731e55f03bc2bd8d3602de5bef5675a97be0a6b
+Author: Kabangu <kabangu@nava.africa>
+Date:   Sun May 2 22:08:52 2021 +0200
+
+    done writing test
+
+commit f800dfbd2cd0cca536c897036840c40f74d4f6e2
+Author: Kabangu <kabangu@nava.africa>
+Date:   Sun May 2 15:33:22 2021 +0200
+
+    added a test_pocker_game file.
+
+commit 5d18a6317145ee74c1011f62d1cc64c6d28a5bf1
+Author: Kabangu <kabangu@nava.africa>
+Date:   Sun May 2 11:10:27 2021 +0200
+
+    done building hands
+
+commit 1565023988f31414f595d6b166b8ddad2ceb6edb
+Author: Kabangu <kabangu@nava.africa>
+Date:   Sat May 1 18:00:54 2021 +0200
+
+    created a Deck class
