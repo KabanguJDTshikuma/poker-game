@@ -15,13 +15,13 @@ def sequential_values(ranks: list):
 
 def hand_split(hand: list, value_dict=None):
     """split suits and ranks from the hand and return them as dictionary of lists"""
-    suits = [card[-1] for card in hand]
-    values = [value_dict[card[:-1]] for card in hand]
+    suits = [card[-1].upper() for card in hand]
+    values = [value_dict[card[:-1].upper()] for card in hand]
     hand_split_dict = list(zip(values, suits))
     return {'suits': suits, 'values': values, 'hands': hand_split_dict}
 
 
-class Deck:
+class Poker:
     def __init__(self):
         # suits = ['Hearts','Diamonds','Clubs','Spades'] 
         suits = ['H', 'D', 'C', 'S']
@@ -31,9 +31,9 @@ class Deck:
         self.cards = [f'{value}{suit}' for suit in suits for value in self.values]
 
     def royal_flash(self, hand: list):
-        print("hand ", hand)
-        print('suits ', hand_split(hand, self.ranks)['suits'])
-        print('values ', hand_split(hand, self.ranks)['values'])
+        # print("hand ", hand)
+        # print('suits ', hand_split(hand, self.ranks)['suits'])
+        # print('values ', hand_split(hand, self.ranks)['values'])
         if len(set(hand_split(hand, self.ranks)['suits'])) == 1 and set(hand_split(hand, self.ranks)['values']) == set(
                 range(10, 15)):
             return True
@@ -49,8 +49,7 @@ class Deck:
     def four_of_kind(self, hand: list):
         value_count = Counter(hand_split(hand, self.ranks)['values'])
         suits_count = Counter(hand_split(hand, self.ranks)['suits'])
-
-        if 4 in list(value_count.values()) and list(suits_count.values()).count(1) >= 4:
+        if 4 in list(value_count.values()) and list(suits_count.values()).count(1) >= 3:
             return True
         return False
 
@@ -109,8 +108,8 @@ class Deck:
             if len(suits) == 4:
                 # print(suits)
                 return True
-            else:
-                return False
+            # else:
+        return False
 
     def pair(self, hand: list):
         value_count = Counter(hand_split(hand, self.ranks)['values'])
@@ -139,7 +138,7 @@ class Deck:
 
 
 def poker_game(hand: list):
-    play_game = Deck()
+    play_game = Poker()
     if play_game.royal_flash(hand):
         return 'royal flash'
     elif play_game.straight_flush(hand):
@@ -162,9 +161,9 @@ def poker_game(hand: list):
 
 
 def main():
-    cards = Deck().cards
+    cards = Poker().cards
     print(cards)
-    # hand = ['AS', '10C', '10H', '3D', '3S']
+    # hand = ['5D', '5C', '5H', '5S', '3H']
     hand = []
     while True:
         if len(hand) < 5:
@@ -176,8 +175,6 @@ def main():
         else:
             print(poker_game(hand))
             hand = []
-    # return poker_game(hand)
-    # return hand
 
 
 if __name__ == '__main__':
